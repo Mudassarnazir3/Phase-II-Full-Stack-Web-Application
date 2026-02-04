@@ -1,0 +1,22 @@
+# Backend API Dependencies - Phase II Todo Application
+# Python 3.11+
+
+# Web Framework
+fastapi==0.109.2
+uvicorn
+[standard]==0.27.1
+
+# ORM and Database
+sqlmodel==0.0.14
+asyncpg==0.29.0
+sqlalchemy[asyncio]==2.0.25
+
+# Authentication
+pyjwt==2.8.0
+
+# Configuration
+pydantic-settings==2.1.0
+python-dotenv==1.0.1
+
+# Utilities
+python-multipart==0.0.9
