@@ -3,8 +3,7 @@
 
 # Web Framework
 fastapi==0.109.2
-uvicorn
-[standard]==0.27.1
+uvicorn[standard]==0.27.1
 
 # ORM and Database
 sqlmodel==0.0.14

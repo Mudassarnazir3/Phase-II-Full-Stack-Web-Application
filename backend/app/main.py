@@ -56,9 +56,13 @@ except Exception:
     frontend_url = "http://localhost:3000"
 
 # Configure CORS middleware (FR-001, api-endpoints.md)
+cors_origins = [frontend_url, "http://localhost:3000"]
+# Filter out duplicates and empty strings
+cors_origins = list(set(o for o in cors_origins if o))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url, "http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
