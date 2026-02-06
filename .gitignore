@@ -21,6 +21,7 @@ Thumbs.db
 
 # Temp files
 tmpclaude-*/
+tmpclaude-*
 
 # Coverage
 .coverage

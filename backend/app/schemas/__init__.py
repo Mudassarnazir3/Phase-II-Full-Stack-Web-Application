@@ -6,6 +6,14 @@ from .task import (
     TaskListResponse,
     ErrorResponse,
 )
+from .auth import (
+    AuthSignUpRequest,
+    AuthSignUpResponse,
+    AuthSignInRequest,
+    AuthSignInResponse,
+    AuthSignOutResponse,
+    UserResponse,
+)
 
 __all__ = [
     "TaskCreate",
@@ -13,4 +21,10 @@ __all__ = [
     "TaskResponse",
     "TaskListResponse",
     "ErrorResponse",
+    "AuthSignUpRequest",
+    "AuthSignUpResponse",
+    "AuthSignInRequest",
+    "AuthSignInResponse",
+    "AuthSignOutResponse",
+    "UserResponse",
 ]

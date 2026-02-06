@@ -189,5 +189,7 @@ async def health_check():
 
 # Import and register routers after app creation to avoid circular imports
 from app.routers.tasks import router as tasks_router  # noqa: E402
+from app.routers.auth import router as auth_router  # noqa: E402
 
+app.include_router(auth_router, prefix="/api", tags=["Authentication"])
 app.include_router(tasks_router, prefix="/api", tags=["Tasks"])

@@ -11,6 +11,7 @@ from sqlmodel import SQLModel
 
 from app.db.session import get_engine
 from app.models.task import Task  # noqa: F401 - Import to register model
+from app.models.user import User  # noqa: F401 - Import to register model
 
 
 async def init_db():

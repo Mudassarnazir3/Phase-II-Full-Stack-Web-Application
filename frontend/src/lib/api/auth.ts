@@ -25,7 +25,7 @@ export async function signUpAPI(
   password: string
 ): Promise<AuthSignUpResponse> {
   const request: AuthSignUpRequest = { email, password };
-  return post<AuthSignUpResponse>('/auth/signup', request);
+  return post<AuthSignUpResponse>('/api/auth/signup', request);
 }
 
 /**
@@ -40,7 +40,7 @@ export async function signInAPI(
   password: string
 ): Promise<AuthSignInResponse> {
   const request: AuthSignInRequest = { email, password };
-  return post<AuthSignInResponse>('/auth/signin', request);
+  return post<AuthSignInResponse>('/api/auth/signin', request);
 }
 
 /**
@@ -53,7 +53,7 @@ export async function signInAPI(
  */
 export async function signOutAPI(): Promise<void> {
   try {
-    await post<{ message: string }>('/auth/signout');
+    await post<{ message: string }>('/api/auth/signout');
   } catch {
     // Ignore errors - always sign out locally
   }
