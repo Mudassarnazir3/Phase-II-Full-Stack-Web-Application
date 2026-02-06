@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+*.egg-info/
+
+# Node.js
+node_modules/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+tmpclaude-*/
+tmpclaude-*
+
+# Coverage
+.coverage
+htmlcov/
+
+# Logs
+*.log
+npm-debug.log*
+
+# next-env
+next-env.d.ts
