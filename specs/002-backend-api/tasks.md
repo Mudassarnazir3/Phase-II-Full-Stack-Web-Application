@@ -244,28 +244,28 @@
 
 ### Security Tests
 
-- [ ] T069 [P] Test cross-user isolation across all endpoints in backend/tests/test_security.py
-- [ ] T070 [P] Test forged user_id in request body is ignored for all write operations in backend/tests/test_security.py
-- [ ] T071 [P] Test no stack traces exposed in any error response in backend/tests/test_security.py
+- [x] T069 [P] Test cross-user isolation across all endpoints in backend/tests/test_security.py
+- [x] T070 [P] Test forged user_id in request body is ignored for all write operations in backend/tests/test_security.py
+- [x] T071 [P] Test no stack traces exposed in any error response in backend/tests/test_security.py
 
 ### Validation Boundary Tests
 
-- [ ] T072 [P] Test title at exactly 200 chars passes in backend/tests/test_validation.py
-- [ ] T073 [P] Test title at 201 chars fails in backend/tests/test_validation.py
-- [ ] T074 [P] Test description at exactly 1000 chars passes in backend/tests/test_validation.py
-- [ ] T075 [P] Test description at 1001 chars fails in backend/tests/test_validation.py
-- [ ] T076 [P] Test whitespace-only title fails in backend/tests/test_validation.py
+- [x] T072 [P] Test title at exactly 200 chars passes in backend/tests/test_validation.py
+- [x] T073 [P] Test title at 201 chars fails in backend/tests/test_validation.py
+- [x] T074 [P] Test description at exactly 1000 chars passes in backend/tests/test_validation.py
+- [x] T075 [P] Test description at 1001 chars fails in backend/tests/test_validation.py
+- [x] T076 [P] Test whitespace-only title fails in backend/tests/test_validation.py
 
 ### Integration Verification
 
-- [ ] T077 Verify response formats match frontend api-client.md contract
-- [ ] T078 Verify CORS configuration allows frontend origin
-- [ ] T079 Verify all timestamps are ISO 8601 UTC format
+- [x] T077 Verify response formats match frontend api-client.md contract
+- [x] T078 Verify CORS configuration allows frontend origin
+- [x] T079 Verify all timestamps are ISO 8601 UTC format
 
 ### Documentation
 
-- [ ] T080 [P] Create backend/README.md with setup and run instructions
-- [ ] T081 Run test coverage report and verify >90% coverage
+- [x] T080 [P] Create backend/README.md with setup and run instructions
+- [x] T081 Run test coverage report and verify >90% coverage
 
 **Checkpoint**: All tests pass, security verified, documentation complete
 

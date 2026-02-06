@@ -19,7 +19,6 @@ FastAPI backend for the Todo web application with JWT authentication and Postgre
 2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
-   pip install -r requirements-dev.txt  # For testing
    ```
 
 3. **Configure environment**:
@@ -40,59 +39,81 @@ uvicorn app.main:app --reload --port 8000
 
 **Production**:
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
+
+API docs available at `http://localhost:8000/docs`.
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check (no auth required) |
-| GET | `/api/tasks` | List user's tasks |
-| POST | `/api/tasks` | Create new task |
-| GET | `/api/tasks/{id}` | Get task by ID |
-| PUT | `/api/tasks/{id}` | Update task |
-| PATCH | `/api/tasks/{id}/toggle` | Toggle completion |
-| DELETE | `/api/tasks/{id}` | Delete task |
+### Authentication
 
-All endpoints except `/api/health` require JWT authentication via `Authorization: Bearer <token>` header.
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/signup` | No | Register new user |
+| POST | `/api/auth/signin` | No | Authenticate, returns JWT |
+| POST | `/api/auth/signout` | No | Sign out (stateless) |
+
+### Tasks
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/tasks` | Yes | List user's tasks |
+| POST | `/api/tasks` | Yes | Create new task |
+| GET | `/api/tasks/{id}` | Yes | Get task by ID |
+| PUT | `/api/tasks/{id}` | Yes | Update task |
+| PATCH | `/api/tasks/{id}/toggle` | Yes | Toggle completion |
+| DELETE | `/api/tasks/{id}` | Yes | Delete task |
+
+### Health
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/health` | No | Health check |
+
+All task endpoints require `Authorization: Bearer <token>` header.
 
 ## Testing
 
+Tests use in-memory SQLite - no database required.
+
 ```bash
 # Run all tests
-pytest
+python -m pytest tests/ -v
 
 # Run with coverage
-pytest --cov=app --cov-report=term-missing
+python -m pytest tests/ --cov=app --cov-report=term-missing
 
 # Run specific test file
-pytest tests/test_auth.py -v
+python -m pytest tests/test_security.py -v
 ```
 
 ## Project Structure
 
 ```
 backend/
-├── app/
-│   ├── main.py           # FastAPI app, middleware, error handlers
-│   ├── config.py         # Environment configuration
-│   ├── dependencies.py   # DI for auth and database
-│   ├── db/
-│   │   ├── init.py       # Database initialization
-│   │   └── session.py    # Async session management
-│   ├── models/
-│   │   └── task.py       # SQLModel Task entity
-│   ├── routers/
-│   │   └── tasks.py      # Task CRUD endpoints
-│   └── schemas/
-│       └── task.py       # Pydantic request/response schemas
-└── tests/
-    ├── conftest.py       # Test fixtures
-    ├── test_auth.py      # JWT authentication tests
-    ├── test_tasks.py     # Task CRUD tests
-    ├── test_security.py  # User isolation tests
-    └── test_validation.py # Input validation tests
+  app/
+    main.py           # FastAPI app, middleware, error handlers
+    config.py          # Environment configuration
+    dependencies.py    # DI for auth and database
+    db/
+      init.py          # Database initialization
+      session.py       # Async session management
+    models/
+      task.py          # SQLModel Task entity
+      user.py          # SQLModel User entity
+    routers/
+      tasks.py         # Task CRUD endpoints
+      auth.py          # Authentication endpoints
+    schemas/
+      task.py          # Task request/response schemas
+      auth.py          # Auth request/response schemas
+  tests/
+    conftest.py        # Test fixtures
+    test_auth.py       # JWT authentication tests
+    test_tasks.py      # Task CRUD tests
+    test_security.py   # User isolation & CORS tests
+    test_validation.py # Input validation tests
 ```
 
 ## Environment Variables

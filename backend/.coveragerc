@@ -1,0 +1,13 @@
+[run]
+source = app
+omit =
+    app/db/session.py
+    app/db/init.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__
+    pass
+fail_under = 90
+show_missing = true

@@ -301,3 +301,152 @@ class TestAuthenticationOnAllEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
+
+
+class TestAuthEndpoints:
+    """Test suite for auth router endpoints (signup, signin, signout)."""
+
+    # === Signup ===
+
+    @pytest.mark.asyncio
+    async def test_signup_creates_user(self, client: AsyncClient):
+        """POST /api/auth/signup creates a new user account."""
+        response = await client.post(
+            "/api/auth/signup",
+            json={"email": "test@example.com", "password": "SecurePass1"},
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["message"] == "Account created successfully"
+
+    @pytest.mark.asyncio
+    async def test_signup_duplicate_email_returns_409(self, client: AsyncClient):
+        """POST /api/auth/signup with existing email returns 409."""
+        payload = {"email": "dup@example.com", "password": "SecurePass1"}
+
+        # First signup
+        await client.post("/api/auth/signup", json=payload)
+
+        # Second signup with same email
+        response = await client.post("/api/auth/signup", json=payload)
+        assert response.status_code == 409
+        data = response.json()
+        assert data["code"] == "EMAIL_EXISTS"
+
+    @pytest.mark.asyncio
+    async def test_signup_weak_password_no_uppercase(self, client: AsyncClient):
+        """Signup with password missing uppercase fails."""
+        response = await client.post(
+            "/api/auth/signup",
+            json={"email": "test@example.com", "password": "nouppercas1"},
+        )
+        assert response.status_code in [400, 422]
+
+    @pytest.mark.asyncio
+    async def test_signup_weak_password_no_lowercase(self, client: AsyncClient):
+        """Signup with password missing lowercase fails."""
+        response = await client.post(
+            "/api/auth/signup",
+            json={"email": "test@example.com", "password": "NOLOWERCASE1"},
+        )
+        assert response.status_code in [400, 422]
+
+    @pytest.mark.asyncio
+    async def test_signup_weak_password_no_digit(self, client: AsyncClient):
+        """Signup with password missing digit fails."""
+        response = await client.post(
+            "/api/auth/signup",
+            json={"email": "test@example.com", "password": "NoDigitHere"},
+        )
+        assert response.status_code in [400, 422]
+
+    @pytest.mark.asyncio
+    async def test_signup_short_password(self, client: AsyncClient):
+        """Signup with password shorter than 8 chars fails."""
+        response = await client.post(
+            "/api/auth/signup",
+            json={"email": "test@example.com", "password": "Aa1"},
+        )
+        assert response.status_code in [400, 422]
+
+    # === Signin ===
+
+    @pytest.mark.asyncio
+    async def test_signin_returns_token(self, client: AsyncClient):
+        """POST /api/auth/signin returns JWT token and user object."""
+        # Create account first
+        await client.post(
+            "/api/auth/signup",
+            json={"email": "login@example.com", "password": "SecurePass1"},
+        )
+
+        # Sign in
+        response = await client.post(
+            "/api/auth/signin",
+            json={"email": "login@example.com", "password": "SecurePass1"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "token" in data
+        assert "user" in data
+        assert data["user"]["email"] == "login@example.com"
+        assert "id" in data["user"]
+
+    @pytest.mark.asyncio
+    async def test_signin_token_works_for_api(self, client: AsyncClient):
+        """Token from signin can be used to access protected endpoints."""
+        # Create account and sign in
+        await client.post(
+            "/api/auth/signup",
+            json={"email": "api@example.com", "password": "SecurePass1"},
+        )
+        signin_response = await client.post(
+            "/api/auth/signin",
+            json={"email": "api@example.com", "password": "SecurePass1"},
+        )
+        token = signin_response.json()["token"]
+
+        # Use token to access tasks
+        response = await client.get(
+            "/api/tasks",
+            headers=auth_header(token),
+        )
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_signin_wrong_password_returns_401(self, client: AsyncClient):
+        """POST /api/auth/signin with wrong password returns 401."""
+        await client.post(
+            "/api/auth/signup",
+            json={"email": "wrong@example.com", "password": "SecurePass1"},
+        )
+
+        response = await client.post(
+            "/api/auth/signin",
+            json={"email": "wrong@example.com", "password": "WrongPass1"},
+        )
+        assert response.status_code == 401
+        data = response.json()
+        assert data["code"] == "INVALID_CREDENTIALS"
+
+    @pytest.mark.asyncio
+    async def test_signin_nonexistent_email_returns_401(self, client: AsyncClient):
+        """POST /api/auth/signin with unknown email returns 401."""
+        response = await client.post(
+            "/api/auth/signin",
+            json={"email": "nobody@example.com", "password": "SecurePass1"},
+        )
+        assert response.status_code == 401
+
+    # === Signout ===
+
+    @pytest.mark.asyncio
+    async def test_signout_returns_message(self, client: AsyncClient):
+        """POST /api/auth/signout returns success message."""
+        response = await client.post("/api/auth/signout")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["message"] == "Signed out successfully"

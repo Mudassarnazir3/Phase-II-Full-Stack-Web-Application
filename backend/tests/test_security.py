@@ -422,3 +422,69 @@ class TestSecurityHeaders:
         assert response.status_code == 401
         assert response.headers.get("X-Content-Type-Options") == "nosniff"
         assert response.headers.get("X-Frame-Options") == "DENY"
+
+
+class TestCORSConfiguration:
+    """Test suite for CORS configuration (T078)."""
+
+    @pytest.mark.asyncio
+    async def test_cors_allows_frontend_origin(self, client: AsyncClient):
+        """T078: CORS allows configured frontend origin."""
+        response = await client.options(
+            "/api/tasks",
+            headers={
+                "Origin": "http://localhost:3000",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": "Authorization,Content-Type",
+            },
+        )
+
+        # Preflight should succeed
+        assert response.status_code == 200
+        assert "http://localhost:3000" in response.headers.get(
+            "Access-Control-Allow-Origin", ""
+        )
+
+    @pytest.mark.asyncio
+    async def test_cors_allows_required_methods(self, client: AsyncClient):
+        """CORS allows all required HTTP methods."""
+        response = await client.options(
+            "/api/tasks",
+            headers={
+                "Origin": "http://localhost:3000",
+                "Access-Control-Request-Method": "POST",
+            },
+        )
+
+        allowed_methods = response.headers.get("Access-Control-Allow-Methods", "")
+        for method in ["GET", "POST", "PUT", "PATCH", "DELETE"]:
+            assert method in allowed_methods
+
+    @pytest.mark.asyncio
+    async def test_cors_allows_auth_header(self, client: AsyncClient):
+        """CORS allows Authorization header."""
+        response = await client.options(
+            "/api/tasks",
+            headers={
+                "Origin": "http://localhost:3000",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": "Authorization",
+            },
+        )
+
+        allowed_headers = response.headers.get("Access-Control-Allow-Headers", "")
+        assert "authorization" in allowed_headers.lower()
+
+    @pytest.mark.asyncio
+    async def test_cors_rejects_unknown_origin(self, client: AsyncClient):
+        """CORS does not allow unknown origins."""
+        response = await client.options(
+            "/api/tasks",
+            headers={
+                "Origin": "http://evil-site.com",
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+
+        allow_origin = response.headers.get("Access-Control-Allow-Origin", "")
+        assert "evil-site.com" not in allow_origin
